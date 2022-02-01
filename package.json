@@ -1,0 +1,30 @@
+{
+  "name": "@acme-shop/shared",
+  "version": "1.0.0",
+  "description": "Shared types and utilities for AcmeShop services",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tm-acme-shop/acme-shop-shared-ts.git"
+  },
+  "keywords": [
+    "acme-shop",
+    "shared",
+    "types"
+  ],
+  "author": "AcmeShop Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^4.9.0"
+  }
+}
