@@ -1,3 +1,4 @@
+// PLAT-002: Initial shared TypeScript types for Acme Shop services
 export type UserRole = 'admin' | 'customer' | 'vendor';
 
 /**
