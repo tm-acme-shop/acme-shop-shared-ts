@@ -1,23 +1,3 @@
-export type OrderStatusV1 = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-
-export interface OrderV1 {
-  id: string;
-  user_id: string;
-  status: OrderStatusV1;
-  items: OrderItemV1[];
-  total: number;
-  currency: string;
-  shipping_address: string;
-  created_at: string;
-}
-
-export interface OrderItemV1 {
-  product_id: string;
-  product_name: string;
-  quantity: number;
-  unit_price: number;
-}
-
 export type OrderStatus =
   | 'pending'
   | 'confirmed'
@@ -77,6 +57,27 @@ export interface CreateOrderRequest {
   notes?: string;
 }
 
+export interface UpdateOrderStatusRequest {
+  status: OrderStatus;
+  notes?: string;
+}
+
+export interface OrderListFilter {
+  userId?: string;
+  status?: OrderStatus;
+  startDate?: string;
+  endDate?: string;
+  limit: number;
+  offset: number;
+}
+
+export interface OrderListResponse {
+  orders: Order[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 export function toFloat(money: Money): number {
   return money.amount / 100;
 }
@@ -94,4 +95,20 @@ export function formatMoney(money: Money): string {
     currency: money.currency,
   });
   return formatter.format(toFloat(money));
+}
+
+export function canCancel(order: Order): boolean {
+  return order.status === 'pending' || order.status === 'confirmed';
+}
+
+export function canRefund(order: Order): boolean {
+  return order.status === 'delivered' && !!order.paymentId;
+}
+
+export function calculateTotal(items: OrderItem[], tax: Money, shippingCost: Money): Money {
+  const subtotal = items.reduce((sum, item) => sum + item.total.amount, 0);
+  return {
+    amount: subtotal + tax.amount + shippingCost.amount,
+    currency: items[0]?.unitPrice.currency || 'USD',
+  };
 }

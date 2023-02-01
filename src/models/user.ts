@@ -1,9 +1,13 @@
 export type UserRole = 'admin' | 'customer' | 'vendor';
 
+/**
+ * @deprecated Use {@link User} instead. This type will be removed in v3.0.
+ */
 export interface UserV1 {
   id: string;
   email: string;
   name: string;
+  /** @deprecated Password should not be in the model */
   password?: string;
   created_at: string;
 }
@@ -46,6 +50,21 @@ export interface UpdateUserRequest {
   preferences?: Partial<UserPreferences>;
 }
 
+export interface UserListFilter {
+  role?: UserRole;
+  active?: boolean;
+  search?: string;
+  limit: number;
+  offset: number;
+}
+
+export interface UserListResponse {
+  users: User[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 /**
  * Get the full name of a user.
  */
@@ -54,8 +73,15 @@ export function getFullName(user: User): string {
 }
 
 /**
+ * Check if a user has admin role.
+ */
+export function isAdmin(user: User): boolean {
+  return user.role === 'admin';
+}
+
+/**
  * Convert a User to the legacy UserV1 format.
- * TODO(TEAM-FRONTEND): Remove after v1 API is disabled
+ * @deprecated Use User directly instead of converting to V1.
  */
 export function toUserV1(user: User): UserV1 {
   return {
@@ -68,6 +94,7 @@ export function toUserV1(user: User): UserV1 {
 
 /**
  * Convert a UserV1 to the new User format.
+ * @deprecated Will be removed when v1 API is disabled.
  * TODO(TEAM-FRONTEND): Remove after v1 API is disabled
  */
 export function fromUserV1(userV1: UserV1): User {

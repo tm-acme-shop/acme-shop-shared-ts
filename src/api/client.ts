@@ -1,7 +1,10 @@
-import { User, UserV1, CreateUserRequest, UpdateUserRequest, toUserV1 } from '../models/user';
-import { Order, OrderV1, CreateOrderRequest } from '../models/order';
-import { Payment, PaymentV1, ProcessPaymentRequest, ProcessPaymentResponse } from '../models/payment';
-import { API_V1_USERS, API_V2_USERS, API_V1_ORDERS, API_V2_ORDERS, API_V1_PAYMENTS, API_V2_PAYMENTS } from './endpoints';
+import { User, UserV1, CreateUserRequest, UpdateUserRequest, UserListFilter, UserListResponse, toUserV1 } from '../models/user';
+import { Order, CreateOrderRequest, UpdateOrderStatusRequest, OrderListFilter, OrderListResponse } from '../models/order';
+import { Payment, ProcessPaymentRequest, ProcessPaymentResponse, RefundRequest, RefundResponse } from '../models/payment';
+import { ApiResponse, PaginatedResponse, RequestOptions, ApiException } from './types';
+import { API_V1_USERS, API_V2_USERS, API_V2_ORDERS, API_V2_PAYMENTS } from './endpoints';
+import { X_ACME_REQUEST_ID, X_USER_ID } from '../constants/headers';
+import { logger } from '../utils/logger';
 
 export interface ApiClientConfig {
   baseUrl: string;
@@ -10,6 +13,9 @@ export interface ApiClientConfig {
   enableLegacyApi?: boolean;
 }
 
+/**
+ * API Client for AcmeShop services.
+ */
 export class ApiClient {
   private readonly config: ApiClientConfig;
 
@@ -21,98 +27,280 @@ export class ApiClient {
     };
   }
 
-  async getUserV1(id: string): Promise<UserV1> {
-    console.log('Fetching user with v1 API:', id);
-    const response = await this.request<UserV1>('GET', `${API_V1_USERS}/${id}`);
+  /**
+   * Get a user by ID using the v1 API.
+   * @deprecated Use {@link getUser} instead.
+   */
+  async getUserV1(id: string, options?: RequestOptions): Promise<UserV1> {
+    console.log('getUserV1 is deprecated, use getUser instead');
+
+    const response = await this.request<UserV1>(
+      'GET',
+      `${API_V1_USERS}/${id}`,
+      undefined,
+      options
+    );
     return response;
   }
 
-  async getUser(id: string): Promise<User> {
-    console.log('Fetching user with v2 API:', id);
-    const response = await this.request<User>('GET', `${API_V2_USERS}/${id}`);
+  /**
+   * Get a user by ID using the v2 API.
+   */
+  async getUser(id: string, options?: RequestOptions): Promise<User> {
+    logger.info('Fetching user', { userId: id });
+
+    const response = await this.request<User>(
+      'GET',
+      `${API_V2_USERS}/${id}`,
+      undefined,
+      options
+    );
     return response;
   }
 
-  async createUserV1(data: Omit<UserV1, 'id' | 'created_at'>): Promise<UserV1> {
-    console.log('Creating user with v1 API:', data.email);
-    const response = await this.request<UserV1>('POST', API_V1_USERS, data);
+  /**
+   * List users using the v1 API.
+   * @deprecated Use {@link listUsers} instead.
+   * TODO(TEAM-FRONTEND): Migrate all callers to v2
+   */
+  async listUsersV1(filter?: Partial<UserListFilter>, options?: RequestOptions): Promise<UserV1[]> {
+    console.log('Fetching users with v1 API');
+
+    const users = await this.request<User[]>(
+      'GET',
+      API_V1_USERS,
+      undefined,
+      options
+    );
+    return users.map(toUserV1);
+  }
+
+  /**
+   * List users using the v2 API.
+   */
+  async listUsers(filter?: UserListFilter, options?: RequestOptions): Promise<UserListResponse> {
+    logger.info('Listing users', { filter });
+
+    const response = await this.request<UserListResponse>(
+      'GET',
+      API_V2_USERS,
+      undefined,
+      options
+    );
     return response;
   }
 
-  async createUser(data: CreateUserRequest): Promise<User> {
-    console.log('Creating user with v2 API:', data.email);
-    const response = await this.request<User>('POST', API_V2_USERS, data);
+  /**
+   * Create a new user.
+   */
+  async createUser(data: CreateUserRequest, options?: RequestOptions): Promise<User> {
+    logger.info('Creating user', { email: data.email });
+
+    const response = await this.request<User>(
+      'POST',
+      API_V2_USERS,
+      data,
+      options
+    );
     return response;
   }
 
-  async updateUser(id: string, data: UpdateUserRequest): Promise<User> {
-    console.log('Updating user:', id);
-    const response = await this.request<User>('PATCH', `${API_V2_USERS}/${id}`, data);
+  /**
+   * Update an existing user.
+   */
+  async updateUser(id: string, data: UpdateUserRequest, options?: RequestOptions): Promise<User> {
+    logger.info('Updating user', { userId: id });
+
+    const response = await this.request<User>(
+      'PATCH',
+      `${API_V2_USERS}/${id}`,
+      data,
+      options
+    );
     return response;
   }
 
-  async getOrderV1(id: string): Promise<OrderV1> {
-    console.log('Fetching order with v1 API:', id);
-    const response = await this.request<OrderV1>('GET', `${API_V1_ORDERS}/${id}`);
+  /**
+   * Delete a user.
+   */
+  async deleteUser(id: string, options?: RequestOptions): Promise<void> {
+    logger.info('Deleting user', { userId: id });
+
+    await this.request<void>(
+      'DELETE',
+      `${API_V2_USERS}/${id}`,
+      undefined,
+      options
+    );
+  }
+
+  /**
+   * Get an order by ID.
+   */
+  async getOrder(id: string, options?: RequestOptions): Promise<Order> {
+    logger.info('Fetching order', { orderId: id });
+
+    const response = await this.request<Order>(
+      'GET',
+      `${API_V2_ORDERS}/${id}`,
+      undefined,
+      options
+    );
     return response;
   }
 
-  async getOrder(id: string): Promise<Order> {
-    console.log('Fetching order with v2 API:', id);
-    const response = await this.request<Order>('GET', `${API_V2_ORDERS}/${id}`);
+  /**
+   * List orders.
+   */
+  async listOrders(filter?: OrderListFilter, options?: RequestOptions): Promise<OrderListResponse> {
+    logger.info('Listing orders', { filter });
+
+    const response = await this.request<OrderListResponse>(
+      'GET',
+      API_V2_ORDERS,
+      undefined,
+      options
+    );
     return response;
   }
 
-  async createOrder(data: CreateOrderRequest): Promise<Order> {
-    console.log('Creating order:', data.userId);
-    const response = await this.request<Order>('POST', API_V2_ORDERS, data);
+  /**
+   * Create a new order.
+   */
+  async createOrder(data: CreateOrderRequest, options?: RequestOptions): Promise<Order> {
+    logger.info('Creating order', { userId: data.userId });
+
+    const response = await this.request<Order>(
+      'POST',
+      API_V2_ORDERS,
+      data,
+      options
+    );
     return response;
   }
 
-  async getPaymentV1(id: string): Promise<PaymentV1> {
-    console.log('Fetching payment with v1 API:', id);
-    const response = await this.request<PaymentV1>('GET', `${API_V1_PAYMENTS}/${id}`);
+  /**
+   * Update order status.
+   */
+  async updateOrderStatus(id: string, data: UpdateOrderStatusRequest, options?: RequestOptions): Promise<Order> {
+    logger.info('Updating order status', { orderId: id, status: data.status });
+
+    const response = await this.request<Order>(
+      'PATCH',
+      `${API_V2_ORDERS}/${id}/status`,
+      data,
+      options
+    );
     return response;
   }
 
-  async getPayment(id: string): Promise<Payment> {
-    console.log('Fetching payment with v2 API:', id);
-    const response = await this.request<Payment>('GET', `${API_V2_PAYMENTS}/${id}`);
+  /**
+   * Process a payment.
+   */
+  async processPayment(data: ProcessPaymentRequest, options?: RequestOptions): Promise<ProcessPaymentResponse> {
+    logger.info('Processing payment', { orderId: data.orderId, amount: data.amount });
+
+    const response = await this.request<ProcessPaymentResponse>(
+      'POST',
+      API_V2_PAYMENTS,
+      data,
+      options
+    );
     return response;
   }
 
-  async processPayment(data: ProcessPaymentRequest): Promise<ProcessPaymentResponse> {
-    console.log('Processing payment for order:', data.orderId);
-    const response = await this.request<ProcessPaymentResponse>('POST', API_V2_PAYMENTS, data);
+  /**
+   * Get payment status.
+   */
+  async getPayment(id: string, options?: RequestOptions): Promise<Payment> {
+    logger.info('Fetching payment', { paymentId: id });
+
+    const response = await this.request<Payment>(
+      'GET',
+      `${API_V2_PAYMENTS}/${id}`,
+      undefined,
+      options
+    );
     return response;
   }
 
-  private async request<T>(method: string, path: string, data?: unknown): Promise<T> {
+  /**
+   * Request a refund.
+   */
+  async refundPayment(data: RefundRequest, options?: RequestOptions): Promise<RefundResponse> {
+    logger.info('Processing refund', { paymentId: data.paymentId, amount: data.amount });
+
+    const response = await this.request<RefundResponse>(
+      'POST',
+      `${API_V2_PAYMENTS}/${data.paymentId}/refund`,
+      data,
+      options
+    );
+    return response;
+  }
+
+  private async request<T>(
+    method: string,
+    path: string,
+    data?: unknown,
+    options?: RequestOptions
+  ): Promise<T> {
     const url = `${this.config.baseUrl}${path}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      ...options?.headers,
     };
 
     if (this.config.apiKey) {
       headers['Authorization'] = `Bearer ${this.config.apiKey}`;
     }
 
-    console.log('Making API request:', method, url);
+    const requestId = generateRequestId();
+    headers[X_ACME_REQUEST_ID] = requestId;
 
-    const response = await fetch(url, {
+    logger.debug('Making API request', {
       method,
-      headers,
-      body: data ? JSON.stringify(data) : undefined,
+      url,
+      requestId,
     });
 
-    if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`);
-    }
+    try {
+      const response = await fetch(url, {
+        method,
+        headers,
+        body: data ? JSON.stringify(data) : undefined,
+        signal: options?.signal,
+      });
 
-    return response.json();
+      if (!response.ok) {
+        const error = await response.json();
+        throw new ApiException(
+          error.code || 'REQUEST_FAILED',
+          error.message || 'Request failed',
+          response.status,
+          error.details
+        );
+      }
+
+      if (response.status === 204) {
+        return undefined as T;
+      }
+
+      return response.json();
+    } catch (error) {
+      logger.error('API request failed', { method, url, error: String(error) });
+      throw error;
+    }
   }
 }
 
+function generateRequestId(): string {
+  return `req-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+}
+
+/**
+ * Create a new API client instance.
+ */
 export function createApiClient(config: ApiClientConfig): ApiClient {
   return new ApiClient(config);
 }
