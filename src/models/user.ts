@@ -14,6 +14,7 @@ export interface UserV1 {
 }
 
 /**
+ * API-145: User type with migration helpers for v1 -> v2 transition
  * User represents a user in the system (v2 API).
  */
 export interface User {
