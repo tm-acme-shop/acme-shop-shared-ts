@@ -72,6 +72,27 @@ export function validatePassword(password: string): ValidationResult {
   return { valid: errors.length === 0, errors };
 }
 
+export function validatePhone(phone: string): ValidationResult {
+  const errors: ValidationError[] = [];
+  const cleanPhone = phone.replace(/\D/g, '');
+
+  if (!phone) {
+    errors.push({
+      field: 'phone',
+      message: 'Phone number is required',
+      code: 'REQUIRED',
+    });
+  } else if (cleanPhone.length < 10 || cleanPhone.length > 15) {
+    errors.push({
+      field: 'phone',
+      message: 'Invalid phone number',
+      code: 'INVALID_FORMAT',
+    });
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
 export function validateRequired(value: unknown, field: string): ValidationResult {
   const errors: ValidationError[] = [];
 

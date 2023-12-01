@@ -94,7 +94,6 @@ export function toUserV1(user: User): UserV1 {
 
 /**
  * Convert a UserV1 to the new User format.
- * @deprecated Will be removed when v1 API is disabled.
  * TODO(TEAM-FRONTEND): Remove after v1 API is disabled
  */
 export function fromUserV1(userV1: UserV1): User {

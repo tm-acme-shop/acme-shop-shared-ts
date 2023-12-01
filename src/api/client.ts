@@ -32,7 +32,7 @@ export class ApiClient {
    * @deprecated Use {@link getUser} instead.
    */
   async getUserV1(id: string, options?: RequestOptions): Promise<UserV1> {
-    console.log('getUserV1 is deprecated, use getUser instead');
+    logger.warn('getUserV1 is deprecated, use getUser instead', { userId: id });
 
     const response = await this.request<UserV1>(
       'GET',
@@ -64,7 +64,7 @@ export class ApiClient {
    * TODO(TEAM-FRONTEND): Migrate all callers to v2
    */
   async listUsersV1(filter?: Partial<UserListFilter>, options?: RequestOptions): Promise<UserV1[]> {
-    console.log('Fetching users with v1 API');
+    console.log('Fetching users with v1 API'); // TODO(TEAM-FRONTEND): Replace with structured logger
 
     const users = await this.request<User[]>(
       'GET',

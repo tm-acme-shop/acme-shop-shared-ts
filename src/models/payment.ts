@@ -85,7 +85,6 @@ export function canRefund(payment: Payment): boolean {
 
 /**
  * Convert legacy payment request to new format.
- * @deprecated Will be removed after legacy API migration.
  * TODO(TEAM-PAYMENTS): Remove after legacy API migration
  */
 export function fromLegacyRequest(legacy: LegacyPaymentRequest, userId: string): ProcessPaymentRequest {

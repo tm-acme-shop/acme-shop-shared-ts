@@ -30,6 +30,11 @@ export const X_SPAN_ID = 'X-Span-ID';
 export const X_API_VERSION = 'X-API-Version';
 
 /**
+ * Client version header.
+ */
+export const X_CLIENT_VERSION = 'X-Client-Version';
+
+/**
  * Get correlation headers from a request.
  * TODO(TEAM-PLATFORM): Migrate legacy header support
  */
