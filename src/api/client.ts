@@ -31,10 +31,10 @@ export class ApiClient {
    * Get a user by ID using the v1 API.
    * @deprecated Use {@link getUser} instead.
    */
-  async getUserV1(id: string, options?: RequestOptions): Promise<UserV1> {
+  async getUser(id: string, options?: RequestOptions): Promise<User> {
     logger.warn('getUserV1 is deprecated, use getUser instead', { userId: id });
 
-    const response = await this.request<UserV1>(
+    const response = await this.request<User>(
       'GET',
       `${API_V1_USERS}/${id}`,
       undefined,
