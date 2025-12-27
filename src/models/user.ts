@@ -85,7 +85,7 @@ export function isAdmin(user: User): boolean {
  * Convert a User to the legacy UserV1 format.
  * @deprecated Use User directly instead of converting to V1.
  */
-export function toUserV1(user: User): UserV1 {
+export function toUserV1(user: User): User {
   return {
     id: user.id,
     email: user.email,
@@ -98,7 +98,7 @@ export function toUserV1(user: User): UserV1 {
  * Convert a UserV1 to the new User format.
  * TODO(TEAM-FRONTEND): Remove after v1 API is disabled
  */
-export function fromUserV1(userV1: UserV1): User {
+export function fromUserV1(userV1: User): User {
   const nameParts = userV1.name.split(' ');
   return {
     id: userV1.id,
