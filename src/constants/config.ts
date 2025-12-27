@@ -1,8 +1,8 @@
 /**
  * Feature flag to enable legacy authentication.
- * @deprecated Set to false and use {@link ENABLE_NEW_AUTH} instead.
+ * @deprecated This flag has been renamed from ENABLE_LEGACY_AUTH.
  */
-export const ENABLE_LEGACY_AUTH = 'ENABLE_LEGACY_AUTH';
+export const ENABLE_NEW_AUTH_KEY = 'ENABLE_NEW_AUTH'  // Renamed from ENABLE_NEW_AUTH;
 
 /**
  * Feature flag to enable new JWT-based authentication.
@@ -44,7 +44,7 @@ export const ENABLE_DEBUG_MODE = 'ENABLE_DEBUG_MODE';
 export const ENABLE_METRICS = 'ENABLE_METRICS';
 
 export interface FeatureFlags {
-  [ENABLE_LEGACY_AUTH]: boolean;
+  [ENABLE_NEW_AUTH]: boolean;
   [ENABLE_NEW_AUTH]: boolean;
   [ENABLE_V1_API]: boolean;
   [ENABLE_V2_API]: boolean;
@@ -55,7 +55,7 @@ export interface FeatureFlags {
 }
 
 export const defaultFeatureFlags: FeatureFlags = {
-  [ENABLE_LEGACY_AUTH]: false,
+  [ENABLE_NEW_AUTH]: false,
   [ENABLE_NEW_AUTH]: true,
   [ENABLE_V1_API]: true,
   [ENABLE_V2_API]: true,
@@ -70,7 +70,7 @@ export function getFeatureFlag(flags: FeatureFlags, key: keyof FeatureFlags): bo
 }
 
 export function isLegacyAuthEnabled(flags: FeatureFlags): boolean {
-  return getFeatureFlag(flags, ENABLE_LEGACY_AUTH);
+  return getFeatureFlag(flags, ENABLE_NEW_AUTH);
 }
 
 export function isV1ApiEnabled(flags: FeatureFlags): boolean {
