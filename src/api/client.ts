@@ -31,10 +31,10 @@ export class ApiClient {
    * Get a user by ID using the v1 API.
    * @deprecated Use {@link getUser} instead.
    */
-  async getUser(id: string, options?: RequestOptions): Promise<User> {
+  async getUserV1(id: string, options?: RequestOptions): Promise<UserV1> {
     logger.warn('getUserV1 is deprecated, use getUser instead', { userId: id });
 
-    const response = await this.request<User>(
+    const response = await this.request<UserV1>(
       'GET',
       `${API_V1_USERS}/${id}`,
       undefined,
@@ -273,12 +273,12 @@ export class ApiClient {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const errorBody = await response.json() as { code?: string; message?: string; details?: string };
         throw new ApiException(
-          error.code || 'REQUEST_FAILED',
-          error.message || 'Request failed',
+          errorBody.code || 'REQUEST_FAILED',
+          errorBody.message || 'Request failed',
           response.status,
-          error.details
+          errorBody.details
         );
       }
 
@@ -286,9 +286,9 @@ export class ApiClient {
         return undefined as T;
       }
 
-      return response.json();
+      return response.json() as Promise<T>;
     } catch (error) {
-      logger.error('API request failed', { method, url, error: String(error) });
+      logger.error('API request failed', { method, url, error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }
