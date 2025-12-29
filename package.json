@@ -26,7 +26,7 @@
   "author": "AcmeShop Team",
   "license": "MIT",
   "publishConfig": {
-    "access": "public"
+    "registry": "https://npm.pkg.github.com"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
