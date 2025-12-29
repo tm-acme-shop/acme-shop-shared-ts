@@ -1,19 +1,19 @@
-# @acme-shop/shared
+# @tm-acme-shop/shared
 
 Shared TypeScript types and utilities for AcmeShop services.
 
 ## Installation
 
 ```bash
-npm install @acme-shop/shared
+npm install @tm-acme-shop/shared
 ```
 
 ## Usage
 
 ```typescript
-import { User, UserV1, ApiClient } from '@acme-shop/shared';
-import { API_V2_USERS } from '@acme-shop/shared/constants';
-import { logger } from '@acme-shop/shared/utils';
+import { User, UserV1, ApiClient } from '@tm-acme-shop/shared';
+import { API_V2_USERS } from '@tm-acme-shop/shared/constants';
+import { logger } from '@tm-acme-shop/shared/utils';
 ```
 
 ## Packages
