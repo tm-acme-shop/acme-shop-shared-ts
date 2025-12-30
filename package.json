@@ -1,6 +1,6 @@
 {
   "name": "@tm-acme-shop/shared",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shared types and utilities for AcmeShop services",
   "main": "src/index.ts",
   "types": "src/index.ts",
