@@ -16,7 +16,6 @@ export interface Order {
   billingAddress: Address;
   subtotal: Money;
   tax: Money;
-  shippingCost: Money;
   total: Money;
   paymentId?: string;
   notes?: string;
@@ -108,10 +107,10 @@ export function canRefund(order: Order): boolean {
   return order.status === 'delivered' && !!order.paymentId;
 }
 
-export function calculateTotal(items: OrderItem[], tax: Money, shippingCost: Money): Money {
+export function calculateTotal(items: OrderItem[], tax: Money): Money {
   const subtotal = items.reduce((sum, item) => sum + item.total.amount, 0);
   return {
-    amount: subtotal + tax.amount + shippingCost.amount,
+    amount: subtotal + tax.amount,
     currency: items[0]?.unitPrice.currency || 'USD',
   };
 }
