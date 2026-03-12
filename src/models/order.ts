@@ -54,6 +54,9 @@ export interface CreateOrderRequest {
   items: Omit<OrderItem, 'id'>[];
   shippingAddress: Address;
   billingAddress: Address;
+  subtotal: Money;
+  tax: Money;
+  total: Money;
   notes?: string;
 }
 
