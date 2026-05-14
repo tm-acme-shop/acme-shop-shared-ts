@@ -103,31 +103,6 @@ class StructuredLogger implements Logger {
   }
 }
 
-/**
- * Legacy console-based logging.
- * @deprecated Use {@link logger} structured logging instead.
- */
-export function logInfo(message: string, ...args: unknown[]): void {
-  console.log(`[INFO] ${message}`, ...args);
-}
-
-/**
- * Legacy console-based logging.
- * @deprecated Use {@link logger} structured logging instead.
- */
-export function logError(message: string, ...args: unknown[]): void {
-  console.error(`[ERROR] ${message}`, ...args);
-}
-
-/**
- * Legacy console-based logging.
- * @deprecated Use {@link logger} structured logging instead.
- * TODO(TEAM-FRONTEND): Migrate all callers to structured logger
- */
-export function logDebug(message: string, ...args: unknown[]): void {
-  console.debug(`[DEBUG] ${message}`, ...args);
-}
-
 export const logger = new StructuredLogger('acme-shop');
 
 export function createLogger(service: string): Logger {
