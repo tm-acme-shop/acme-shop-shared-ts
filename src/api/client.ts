@@ -1,8 +1,8 @@
-import { User, UserV1, CreateUserRequest, UpdateUserRequest, UserListFilter, UserListResponse, toUserV1 } from '../models/user';
+import { User, CreateUserRequest, UpdateUserRequest, UserListFilter, UserListResponse } from '../models/user';
 import { Order, CreateOrderRequest, UpdateOrderStatusRequest, OrderListFilter, OrderListResponse } from '../models/order';
 import { Payment, ProcessPaymentRequest, ProcessPaymentResponse, RefundRequest, RefundResponse } from '../models/payment';
 import { ApiResponse, PaginatedResponse, RequestOptions, ApiException } from './types';
-import { API_V1_USERS, API_V2_USERS, API_V2_ORDERS, API_V2_PAYMENTS } from './endpoints';
+import { API_V2_USERS, API_V2_ORDERS, API_V2_PAYMENTS } from './endpoints';
 import { X_ACME_REQUEST_ID, X_USER_ID } from '../constants/headers';
 import { logger } from '../utils/logger';
 
@@ -28,22 +28,6 @@ export class ApiClient {
   }
 
   /**
-   * Get a user by ID using the v1 API.
-   * @deprecated Use {@link getUser} instead.
-   */
-  async getUserV1(id: string, options?: RequestOptions): Promise<UserV1> {
-    logger.warn('getUserV1 is deprecated, use getUser instead', { userId: id });
-
-    const response = await this.request<UserV1>(
-      'GET',
-      `${API_V1_USERS}/${id}`,
-      undefined,
-      options
-    );
-    return response;
-  }
-
-  /**
    * Get a user by ID using the v2 API.
    */
   async getUser(id: string, options?: RequestOptions): Promise<User> {
@@ -56,23 +40,6 @@ export class ApiClient {
       options
     );
     return response;
-  }
-
-  /**
-   * List users using the v1 API.
-   * @deprecated Use {@link listUsers} instead.
-   * TODO(TEAM-FRONTEND): Migrate all callers to v2
-   */
-  async listUsersV1(filter?: Partial<UserListFilter>, options?: RequestOptions): Promise<UserV1[]> {
-    console.log('Fetching users with v1 API'); // TODO(TEAM-FRONTEND): Replace with structured logger
-
-    const users = await this.request<User[]>(
-      'GET',
-      API_V1_USERS,
-      undefined,
-      options
-    );
-    return users.map(toUserV1);
   }
 
   /**

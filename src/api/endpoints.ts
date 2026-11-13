@@ -1,10 +1,4 @@
 /**
- * API v1 Users endpoint.
- * @deprecated Use {@link API_V2_USERS} instead. V1 API will be removed in Q2 2024.
- */
-export const API_V1_USERS = '/api/v1/users';
-
-/**
  * API v2 Users endpoint.
  */
 export const API_V2_USERS = '/api/v2/users';
@@ -54,10 +48,9 @@ export interface EndpointConfig {
 
 /**
  * Get the full URL for a user endpoint.
- * TODO(TEAM-FRONTEND): Migrate all v1 usages to v2
  */
 export function getUsersEndpoint(config: EndpointConfig, userId?: string): string {
-  const base = config.version === 'v1' ? API_V1_USERS : API_V2_USERS;
+  const base = API_V2_USERS;
   const url = `${config.baseUrl}${base}`;
   return userId ? `${url}/${userId}` : url;
 }
